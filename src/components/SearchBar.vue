@@ -52,7 +52,7 @@ import SearchResults from './SearchResults.vue';
       this.access_token = localStorage.getItem("access_token");
       this.access_token_expire_time = parseInt(localStorage.getItem("access_token_expire_time"));
       this.time_now = parseInt(localStorage.getItem("time_now"));
-      if(Date.now() > this.access_token_expire_time) {
+      if(Date.now() > this.access_token_expire_time || this.access_token === null) {
         this.renewToken();
       };
     },
