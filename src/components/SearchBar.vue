@@ -25,7 +25,9 @@ import SearchResults from './SearchResults.vue';
             .then((response) => {
               this.songs = response.data.tracks.items;
             })
-            .catch((err) => console.log(err))
+            .catch((err) => {
+              console.log(err);
+            })
             .finally(()=>{
               document.getElementById("loader").classList.add('hidden');
               document.getElementById("songs").classList.remove('hidden');
@@ -33,26 +35,24 @@ import SearchResults from './SearchResults.vue';
             
           },
           renewToken() {
-            document.getElementById("loader").classList.remove('hidden');
-            document.getElementById("songs").classList.add('hidden');
+            console.log('Renew Initiated');
             axios.post('https://accounts.spotify.com/api/token', `grant_type=client_credentials&client_id=${this.clientId}&client_secret=${this.clientSecret}`)
             .then((res)=> {
+              console.log('Renew in process');
               localStorage.setItem("access_token", res.data.access_token);
               localStorage.setItem("access_token_expire_time", Date.now() + (res.data.expires_in * 1000));
               localStorage.setItem("time_now", Date.now());
+              console.log('Token Renewed');
+              location.reload();
             })
-            .catch((err)=>console.log(err))
-            .finally(()=> {
-              document.getElementById("loader").classList.add('hidden');
-              document.getElementById("songs").classList.remove('hidden');
-            })
+            .catch((err)=>console.log(err));
           }
         },
-    mounted() {
+    beforeMount() {
       this.access_token = localStorage.getItem("access_token");
       this.access_token_expire_time = parseInt(localStorage.getItem("access_token_expire_time"));
       this.time_now = parseInt(localStorage.getItem("time_now"));
-      if(Date.now() > this.access_token_expire_time || this.access_token === null) {
+      if(this.access_token === null || Date.now() > this.access_token_expire_time) {
         this.renewToken();
       };
     },
